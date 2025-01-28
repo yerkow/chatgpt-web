@@ -1,25 +1,25 @@
 <script setup lang='ts'>
-import type { Ref } from 'vue'
-import { computed, defineAsyncComponent, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
-import { useRoute } from 'vue-router'
-import { storeToRefs } from 'pinia'
-import type { MessageReactive, UploadFileInfo } from 'naive-ui'
-import { NAutoComplete, NButton, NInput, NSelect, NSlider, NSpace, NSpin, NUpload, useDialog, useMessage } from 'naive-ui'
+import type {Ref} from 'vue'
+import {computed, defineAsyncComponent, nextTick, onMounted, onUnmounted, ref, watch} from 'vue'
+import {useRoute} from 'vue-router'
+import {storeToRefs} from 'pinia'
+import type {MessageReactive, UploadFileInfo} from 'naive-ui'
+import {NAutoComplete, NButton, NInput, NSelect, NSlider, NSpace, NSpin, NUpload, useDialog, useMessage} from 'naive-ui'
 import html2canvas from 'html2canvas'
-import { Message } from './components'
-import { useScroll } from './hooks/useScroll'
-import { useChat } from './hooks/useChat'
+import {Message} from './components'
+import {useScroll} from './hooks/useScroll'
+import {useChat} from './hooks/useChat'
 import HeaderComponent from './components/Header/index.vue'
-import { HoverButton, SvgIcon } from '@/components/common'
-import { useBasicLayout } from '@/hooks/useBasicLayout'
-import { useAuthStore, useChatStore, usePromptStore, useUserStore } from '@/store'
+import {HoverButton, SvgIcon} from '@/components/common'
+import {useBasicLayout} from '@/hooks/useBasicLayout'
+import {useAuthStore, useChatStore, usePromptStore, useUserStore} from '@/store'
 import {
   fetchChatAPIProcess,
   fetchChatResponseoHistory,
   fetchChatStopResponding,
 } from '@/api'
-import { t } from '@/locales'
-import { debounce } from '@/utils/functions/debounce'
+import {t} from '@/locales'
+import {debounce} from '@/utils/functions/debounce'
 import IconPrompt from '@/icons/Prompt.vue'
 
 const Prompt = defineAsyncComponent(() => import('@/components/common/Setting/Prompt.vue'))
@@ -36,11 +36,11 @@ const authStore = useAuthStore()
 const userStore = useUserStore()
 const chatStore = useChatStore()
 
-const { isMobile } = useBasicLayout()
-const { addChat, updateChat, updateChatSome, getChatByUuidAndIndex } = useChat()
-const { scrollRef, scrollToBottom, scrollToBottomIfAtBottom, scrollTo } = useScroll()
+const {isMobile} = useBasicLayout()
+const {addChat, updateChat, updateChatSome, getChatByUuidAndIndex} = useChat()
+const {scrollRef, scrollToBottom, scrollToBottomIfAtBottom, scrollTo} = useScroll()
 
-const { uuid } = route.params as { uuid: string }
+const {uuid} = route.params as { uuid: string }
 
 const currentChatHistory = computed(() => chatStore.getChatHistoryByCurrentActive)
 const usingContext = computed(() => currentChatHistory?.value?.usingContext ?? true)
@@ -68,12 +68,12 @@ const promptStore = usePromptStore()
 
 // 使用storeToRefs，保证store修改后，联想部分能够重新渲染
 // @ts-expect-error TS2339: Property 'promptList' does not exist on type 'StoreToRefs<any>'.
-const { promptList: promptTemplate } = storeToRefs<any>(promptStore)
+const {promptList: promptTemplate} = storeToRefs<any>(promptStore)
 
 // 未知原因刷新页面，loading 状态不会重置，手动重置
 dataSources.value.forEach((item, index) => {
   if (item.loading)
-    updateChatSome(+uuid, index, { loading: false })
+    updateChatSome(+uuid, index, {loading: false})
 })
 
 function handleSubmit() {
@@ -101,17 +101,17 @@ async function onConversation() {
 
   const chatUuid = Date.now()
   addChat(
-    +uuid,
-    {
-      uuid: chatUuid,
-      dateTime: new Date().toLocaleString(),
-      text: message,
-      images: uploadFileKeys,
-      inversion: true,
-      error: false,
-      conversationOptions: null,
-      requestOptions: { prompt: message, options: null },
-    },
+      +uuid,
+      {
+        uuid: chatUuid,
+        dateTime: new Date().toLocaleString(),
+        text: message,
+        images: uploadFileKeys,
+        inversion: true,
+        error: false,
+        conversationOptions: null,
+        requestOptions: {prompt: message, options: null},
+      },
   )
   scrollToBottom()
 
@@ -122,20 +122,20 @@ async function onConversation() {
   const lastContext = conversationList.value[conversationList.value.length - 1]?.conversationOptions
 
   if (lastContext && usingContext.value)
-    options = { ...lastContext }
+    options = {...lastContext}
 
   addChat(
-    +uuid,
-    {
-      uuid: chatUuid,
-      dateTime: new Date().toLocaleString(),
-      text: '',
-      loading: true,
-      inversion: false,
-      error: false,
-      conversationOptions: null,
-      requestOptions: { prompt: message, options: { ...options } },
-    },
+      +uuid,
+      {
+        uuid: chatUuid,
+        dateTime: new Date().toLocaleString(),
+        text: '',
+        loading: true,
+        inversion: false,
+        error: false,
+        conversationOptions: null,
+        requestOptions: {prompt: message, options: {...options}},
+      },
   )
   scrollToBottom()
 
@@ -149,9 +149,9 @@ async function onConversation() {
         uploadFileKeys,
         options,
         signal: controller.signal,
-        onDownloadProgress: ({ event }) => {
+        onDownloadProgress: ({event}) => {
           const xhr = event.target
-          const { responseText } = xhr
+          const {responseText} = xhr
           // Always process the final line
           const lastIndex = responseText.lastIndexOf('\n', responseText.length - 2)
           let chunk = responseText
@@ -161,26 +161,26 @@ async function onConversation() {
             const data = JSON.parse(chunk)
             lastChatInfo = data
             const usage = (data.detail && data.detail.usage)
-              ? {
+                ? {
                   completion_tokens: data.detail.usage.completion_tokens || null,
                   prompt_tokens: data.detail.usage.prompt_tokens || null,
                   total_tokens: data.detail.usage.total_tokens || null,
                   estimated: data.detail.usage.estimated || null,
                 }
-              : undefined
+                : undefined
             updateChat(
-              +uuid,
-              dataSources.value.length - 1,
-              {
-                dateTime: new Date().toLocaleString(),
-                text: lastText + (data.text ?? ''),
-                inversion: false,
-                error: false,
-                loading: true,
-                conversationOptions: { conversationId: data.conversationId, parentMessageId: data.id },
-                requestOptions: { prompt: message, options: { ...options } },
-                usage,
-              },
+                +uuid,
+                dataSources.value.length - 1,
+                {
+                  dateTime: new Date().toLocaleString(),
+                  text: lastText + (data.text ?? ''),
+                  inversion: false,
+                  error: false,
+                  loading: true,
+                  conversationOptions: {conversationId: data.conversationId, parentMessageId: data.id},
+                  requestOptions: {prompt: message, options: {...options}},
+                  usage,
+                },
             )
 
             if (openLongReply && data.detail && data.detail.choices.length > 0 && data.detail.choices[0].finish_reason === 'length') {
@@ -191,27 +191,25 @@ async function onConversation() {
             }
 
             scrollToBottomIfAtBottom()
-          }
-          catch (error) {
+          } catch (error) {
             //
           }
         },
       })
-      updateChatSome(+uuid, dataSources.value.length - 1, { loading: false })
+      updateChatSome(+uuid, dataSources.value.length - 1, {loading: false})
     }
 
     await fetchChatAPIOnce()
-  }
-  catch (error: any) {
+  } catch (error: any) {
     const errorMessage = error?.message ?? t('common.wrong')
 
     if (error.message === 'canceled') {
       updateChatSome(
-        +uuid,
-        dataSources.value.length - 1,
-        {
-          loading: false,
-        },
+          +uuid,
+          dataSources.value.length - 1,
+          {
+            loading: false,
+          },
       )
       scrollToBottomIfAtBottom()
       return
@@ -221,33 +219,32 @@ async function onConversation() {
 
     if (currentChat?.text && currentChat.text !== '') {
       updateChatSome(
-        +uuid,
-        dataSources.value.length - 1,
-        {
-          text: `${currentChat.text}\n[${errorMessage}]`,
-          error: false,
-          loading: false,
-        },
+          +uuid,
+          dataSources.value.length - 1,
+          {
+            text: `${currentChat.text}\n[${errorMessage}]`,
+            error: false,
+            loading: false,
+          },
       )
       return
     }
 
     updateChat(
-      +uuid,
-      dataSources.value.length - 1,
-      {
-        dateTime: new Date().toLocaleString(),
-        text: errorMessage,
-        inversion: false,
-        error: true,
-        loading: false,
-        conversationOptions: null,
-        requestOptions: { prompt: message, options: { ...options } },
-      },
+        +uuid,
+        dataSources.value.length - 1,
+        {
+          dateTime: new Date().toLocaleString(),
+          text: errorMessage,
+          inversion: false,
+          error: true,
+          loading: false,
+          conversationOptions: null,
+          requestOptions: {prompt: message, options: {...options}},
+        },
     )
     scrollToBottomIfAtBottom()
-  }
-  finally {
+  } finally {
     loading.value = false
   }
 }
@@ -258,7 +255,7 @@ async function onRegenerate(index: number) {
 
   controller = new AbortController()
 
-  const { requestOptions } = dataSources.value[index]
+  const {requestOptions} = dataSources.value[index]
   let responseCount = dataSources.value[index].responseCount || 1
   responseCount++
 
@@ -267,23 +264,23 @@ async function onRegenerate(index: number) {
   let options: Chat.ConversationRequest = {}
 
   if (requestOptions.options)
-    options = { ...requestOptions.options }
+    options = {...requestOptions.options}
 
   loading.value = true
   const chatUuid = dataSources.value[index].uuid
   updateChat(
-    +uuid,
-    index,
-    {
-      dateTime: new Date().toLocaleString(),
-      text: '',
-      inversion: false,
-      responseCount,
-      error: false,
-      loading: true,
-      conversationOptions: null,
-      requestOptions: { prompt: message, options: { ...options } },
-    },
+      +uuid,
+      index,
+      {
+        dateTime: new Date().toLocaleString(),
+        text: '',
+        inversion: false,
+        responseCount,
+        error: false,
+        loading: true,
+        conversationOptions: null,
+        requestOptions: {prompt: message, options: {...options}},
+      },
   )
 
   try {
@@ -296,9 +293,9 @@ async function onRegenerate(index: number) {
         prompt: message,
         options,
         signal: controller.signal,
-        onDownloadProgress: ({ event }) => {
+        onDownloadProgress: ({event}) => {
           const xhr = event.target
-          const { responseText } = xhr
+          const {responseText} = xhr
           // Always process the final line
           const lastIndex = responseText.lastIndexOf('\n', responseText.length - 2)
           let chunk = responseText
@@ -308,27 +305,27 @@ async function onRegenerate(index: number) {
             const data = JSON.parse(chunk)
             lastChatInfo = data
             const usage = (data.detail && data.detail.usage)
-              ? {
+                ? {
                   completion_tokens: data.detail.usage.completion_tokens || null,
                   prompt_tokens: data.detail.usage.prompt_tokens || null,
                   total_tokens: data.detail.usage.total_tokens || null,
                   estimated: data.detail.usage.estimated || null,
                 }
-              : undefined
+                : undefined
             updateChat(
-              +uuid,
-              index,
-              {
-                dateTime: new Date().toLocaleString(),
-                text: lastText + (data.text ?? ''),
-                inversion: false,
-                responseCount,
-                error: false,
-                loading: true,
-                conversationOptions: { conversationId: data.conversationId, parentMessageId: data.id },
-                requestOptions: { prompt: message, options: { ...options } },
-                usage,
-              },
+                +uuid,
+                index,
+                {
+                  dateTime: new Date().toLocaleString(),
+                  text: lastText + (data.text ?? ''),
+                  inversion: false,
+                  responseCount,
+                  error: false,
+                  loading: true,
+                  conversationOptions: {conversationId: data.conversationId, parentMessageId: data.id},
+                  requestOptions: {prompt: message, options: {...options}},
+                  usage,
+                },
             )
 
             if (openLongReply && data.detail && data.detail.choices.length > 0 && data.detail.choices[0].finish_reason === 'length') {
@@ -337,24 +334,22 @@ async function onRegenerate(index: number) {
               message = ''
               return fetchChatAPIOnce()
             }
-          }
-          catch (error) {
+          } catch (error) {
             //
           }
         },
       })
-      updateChatSome(+uuid, index, { loading: false })
+      updateChatSome(+uuid, index, {loading: false})
     }
     await fetchChatAPIOnce()
-  }
-  catch (error: any) {
+  } catch (error: any) {
     if (error.message === 'canceled') {
       updateChatSome(
-        +uuid,
-        index,
-        {
-          loading: false,
-        },
+          +uuid,
+          index,
+          {
+            loading: false,
+          },
       )
       return
     }
@@ -362,21 +357,20 @@ async function onRegenerate(index: number) {
     const errorMessage = error?.message ?? t('common.wrong')
 
     updateChat(
-      +uuid,
-      index,
-      {
-        dateTime: new Date().toLocaleString(),
-        text: errorMessage,
-        inversion: false,
-        responseCount,
-        error: true,
-        loading: false,
-        conversationOptions: null,
-        requestOptions: { prompt: message, options: { ...options } },
-      },
+        +uuid,
+        index,
+        {
+          dateTime: new Date().toLocaleString(),
+          text: errorMessage,
+          inversion: false,
+          responseCount,
+          error: true,
+          loading: false,
+          conversationOptions: null,
+          requestOptions: {prompt: message, options: {...options}},
+        },
     )
-  }
-  finally {
+  } finally {
     loading.value = false
   }
 }
@@ -384,19 +378,19 @@ async function onRegenerate(index: number) {
 async function onResponseHistory(index: number, historyIndex: number) {
   const chat = (await fetchChatResponseoHistory(+uuid, dataSources.value[index].uuid || Date.now(), historyIndex)).data
   updateChat(
-    +uuid,
-    index,
-    {
-      dateTime: chat.dateTime,
-      text: chat.text,
-      inversion: false,
-      responseCount: chat.responseCount,
-      error: true,
-      loading: false,
-      conversationOptions: chat.conversationOptions,
-      requestOptions: { prompt: chat.requestOptions.prompt, options: { ...chat.requestOptions.options } },
-      usage: chat.usage,
-    },
+      +uuid,
+      index,
+      {
+        dateTime: chat.dateTime,
+        text: chat.text,
+        inversion: false,
+        responseCount: chat.responseCount,
+        error: true,
+        loading: false,
+        conversationOptions: chat.conversationOptions,
+        requestOptions: {prompt: chat.requestOptions.prompt, options: {...chat.requestOptions.options}},
+        usage: chat.usage,
+      },
   )
 }
 
@@ -431,11 +425,9 @@ function handleExport() {
         d.loading = false
         ms.success(t('chat.exportSuccess'))
         Promise.resolve()
-      }
-      catch (error: any) {
+      } catch (error: any) {
         ms.error(t('chat.exportFailed'))
-      }
-      finally {
+      } finally {
         d.loading = false
       }
     },
@@ -448,8 +440,7 @@ function handleDelete(index: number, fast: boolean) {
 
   if (fast === true) {
     chatStore.deleteChatByUuid(+uuid, index)
-  }
-  else {
+  } else {
     dialog.warning({
       title: t('chat.deleteMessage'),
       content: t('chat.deleteMessageConfirm'),
@@ -487,8 +478,7 @@ function handleEnter(event: KeyboardEvent) {
       event.preventDefault()
       handleSubmit()
     }
-  }
-  else {
+  } else {
     if (event.key === 'Enter' && event.ctrlKey) {
       event.preventDefault()
       handleSubmit()
@@ -512,14 +502,14 @@ async function loadMoreMessage(event: any) {
   const scrollPosition = event.target.scrollHeight - event.target.scrollTop
 
   const lastId = chatStore.chat[chatIndex].data[0].uuid
-  await chatStore.syncChat({ uuid: +uuid } as Chat.History, lastId, () => {
+  await chatStore.syncChat({uuid: +uuid} as Chat.History, lastId, () => {
     loadingms && loadingms.destroy()
     nextTick(() => scrollTo(event.target.scrollHeight - scrollPosition))
   }, () => {
     loadingms = ms.loading(
-      '加载中...', {
-        duration: 0,
-      },
+        '加载中...', {
+          duration: 0,
+        },
     )
   }, () => {
     allmsg && allmsg.destroy()
@@ -531,17 +521,17 @@ async function loadMoreMessage(event: any) {
 
 const handleLoadMoreMessage = debounce(loadMoreMessage, 300)
 const handleSyncChat
-  = debounce(() => {
-    // 直接刷 极小概率不请求
-    chatStore.syncChat({ uuid: Number(uuid) } as Chat.History, undefined, () => {
-      firstLoading.value = false
-      const scrollRef = document.querySelector('#scrollRef')
-      if (scrollRef)
-        nextTick(() => scrollRef.scrollTop = scrollRef.scrollHeight)
-      if (inputRef.value && !isMobile.value)
-        inputRef.value?.focus()
-    })
-  }, 200)
+    = debounce(() => {
+  // 直接刷 极小概率不请求
+  chatStore.syncChat({uuid: Number(uuid)} as Chat.History, undefined, () => {
+    firstLoading.value = false
+    const scrollRef = document.querySelector('#scrollRef')
+    if (scrollRef)
+      nextTick(() => scrollRef.scrollTop = scrollRef.scrollHeight)
+    if (inputRef.value && !isMobile.value)
+      inputRef.value?.focus()
+  })
+}, 200)
 
 async function handleScroll(event: any) {
   const scrollTop = event.target.scrollTop
@@ -567,14 +557,15 @@ async function handleToggleUsingContext() {
 // 理想状态下其实应该是key作为索引项,但官方的renderOption会出现问题，所以就需要value反renderLabel实现
 const searchOptions = computed(() => {
   if (prompt.value.startsWith('/')) {
-    return promptTemplate.value.filter((item: { title: string }) => item.title.toLowerCase().includes(prompt.value.substring(1).toLowerCase())).map((obj: { value: any }) => {
+    return promptTemplate.value.filter((item: {
+      title: string
+    }) => item.title.toLowerCase().includes(prompt.value.substring(1).toLowerCase())).map((obj: { value: any }) => {
       return {
         label: obj.value,
         value: obj.value,
       }
     })
-  }
-  else {
+  } else {
     return []
   }
 })
@@ -640,7 +631,7 @@ onMounted(() => {
   if (authStore.token) {
     const chatModels = authStore.session?.chatModels
     if (chatModels != null && chatModels.filter(d => d.value === userStore.userInfo.config.chatModel).length <= 0)
-      ms.error('你选择的模型已不存在，请重新选择 | The selected model not exists, please choose again.', { duration: 7000 })
+      ms.error('你选择的模型已不存在，请重新选择 | The selected model not exists, please choose again.', {duration: 7000})
   }
 })
 
@@ -657,50 +648,50 @@ onUnmounted(() => {
 <template>
   <div class="flex flex-col w-full h-full">
     <HeaderComponent
-      v-if="isMobile"
-      :using-context="usingContext"
-      :show-prompt="showPrompt"
-      @export="handleExport" @toggle-using-context="handleToggleUsingContext"
-      @toggle-show-prompt="showPrompt = true"
+        v-if="isMobile"
+        :using-context="usingContext"
+        :show-prompt="showPrompt"
+        @export="handleExport" @toggle-using-context="handleToggleUsingContext"
+        @toggle-show-prompt="showPrompt = true"
     />
     <main class="flex-1 overflow-hidden">
       <div id="scrollRef" ref="scrollRef" class="h-full overflow-hidden overflow-y-auto" @scroll="handleScroll">
         <div
-          id="image-wrapper"
-          class="w-full max-w-screen-xl m-auto dark:bg-[#101014]"
-          :class="[isMobile ? 'p-2' : 'p-4']"
+            id="image-wrapper"
+            class="w-full max-w-screen-xl m-auto dark:bg-[#101014]"
+            :class="[isMobile ? 'p-2' : 'p-4']"
         >
           <NSpin :show="firstLoading">
             <template v-if="!dataSources.length">
               <div class="flex items-center justify-center mt-4 text-center text-neutral-300">
-                <SvgIcon icon="ri:bubble-chart-fill" class="mr-2 text-3xl" />
+                <SvgIcon icon="ri:bubble-chart-fill" class="mr-2 text-3xl"/>
                 <span>Привет!</span>
               </div>
             </template>
             <template v-else>
               <div>
                 <Message
-                  v-for="(item, index) of dataSources"
-                  :key="String(item.uuid) + String(item.inversion)"
-                  :index="index"
-                  :current-nav-index="currentNavIndexRef"
-                  :date-time="item.dateTime"
-                  :text="item.text"
-                  :images="item.images"
-                  :inversion="item.inversion"
-                  :response-count="item.responseCount"
-                  :usage="item && item.usage || undefined"
-                  :error="item.error"
-                  :loading="item.loading"
-                  @regenerate="onRegenerate(index)"
-                  @update-current-nav-index="(itemId: number) => updateCurrentNavIndex(index, itemId)"
-                  @delete="(fast) => handleDelete(index, fast)"
-                  @response-history="(ev) => onResponseHistory(index, ev)"
+                    v-for="(item, index) of dataSources"
+                    :key="String(item.uuid) + String(item.inversion)"
+                    :index="index"
+                    :current-nav-index="currentNavIndexRef"
+                    :date-time="item.dateTime"
+                    :text="item.text"
+                    :images="item.images"
+                    :inversion="item.inversion"
+                    :response-count="item.responseCount"
+                    :usage="item && item.usage || undefined"
+                    :error="item.error"
+                    :loading="item.loading"
+                    @regenerate="onRegenerate(index)"
+                    @update-current-nav-index="(itemId: number) => updateCurrentNavIndex(index, itemId)"
+                    @delete="(fast) => handleDelete(index, fast)"
+                    @response-history="(ev) => onResponseHistory(index, ev)"
                 />
                 <div class="sticky bottom-0 left-0 flex justify-center">
                   <NButton v-if="loading" type="warning" @click="handleStop">
                     <template #icon>
-                      <SvgIcon icon="ri:stop-circle-line" />
+                      <SvgIcon icon="ri:stop-circle-line"/>
                     </template>
                     Stop Responding
                   </NButton>
@@ -719,7 +710,7 @@ onUnmounted(() => {
               <img v-for="(v, i) of uploadFileKeysRef" :key="i" :src="`/uploads/${v}`" class="max-h-10">
               <HoverButton @click="handleDeleteUploadFile">
                 <span class="text-xl text-[#4f555e] dark:text-white">
-                  <SvgIcon icon="ri:delete-back-2-fill" />
+                  <SvgIcon icon="ri:delete-back-2-fill"/>
                 </span>
               </HoverButton>
             </NSpace>
@@ -728,74 +719,79 @@ onUnmounted(() => {
           <div class="flex items-center space-x-2">
             <div>
               <NUpload
-                :disabled="!isVisionModel"
-                action="/api/upload-image"
-                list-type="image"
-                class="flex items-center justify-center h-10 transition hover:bg-neutral-100 dark:hover:bg-[#414755]"
-                style="flex-flow:row nowrap;min-width:2.5em;padding:.5em;border-radius:.5em;"
-                :headers="uploadHeaders"
-                :show-file-list="false"
-                :multiple="true"
-                response-type="json"
-                accept="image/png, image/jpeg, image/webp, image/gif"
-                @finish="handleFinish"
+                  :disabled="!isVisionModel"
+                  action="/api/upload-image"
+                  list-type="image"
+                  class="flex items-center justify-center h-10 transition hover:bg-neutral-100 dark:hover:bg-[#414755]"
+                  style="flex-flow:row nowrap;min-width:2.5em;padding:.5em;border-radius:.5em;"
+                  :headers="uploadHeaders"
+                  :show-file-list="false"
+                  :multiple="true"
+                  response-type="json"
+                  accept="*/*"
+                  @finish="handleFinish"
               >
                 <span class="text-xl text-[#4f555e] dark:text-white">
-                  <SvgIcon icon="ri:image-edit-line" />
+                  <SvgIcon icon="ri:image-edit-line"/>
                 </span>
               </NUpload>
             </div>
             <HoverButton @click="handleClear">
               <span class="text-xl text-[#4f555e] dark:text-white">
-                <SvgIcon icon="ri:delete-bin-line" />
+                <SvgIcon icon="ri:delete-bin-line"/>
               </span>
             </HoverButton>
             <HoverButton v-if="!isMobile" @click="handleExport">
               <span class="text-xl text-[#4f555e] dark:text-white">
-                <SvgIcon icon="ri:download-2-line" />
+                <SvgIcon icon="ri:download-2-line"/>
               </span>
             </HoverButton>
             <HoverButton v-if="!isMobile" @click="showPrompt = true">
               <span class="text-xl text-[#4f555e] dark:text-white">
-                <IconPrompt class="w-[20px] m-auto" />
+                <IconPrompt class="w-[20px] m-auto"/>
               </span>
             </HoverButton>
-            <HoverButton v-if="!isMobile" :tooltip="usingContext ? $t('chat.clickTurnOffContext') : $t('chat.clickTurnOnContext')" :class="{ 'text-[#4b9e5f]': usingContext, 'text-[#a8071a]': !usingContext }" @click="handleToggleUsingContext">
+            <HoverButton v-if="!isMobile"
+                         :tooltip="usingContext ? $t('chat.clickTurnOffContext') : $t('chat.clickTurnOnContext')"
+                         :class="{ 'text-[#4b9e5f]': usingContext, 'text-[#a8071a]': !usingContext }"
+                         @click="handleToggleUsingContext">
               <span class="text-xl">
-                <SvgIcon icon="ri:chat-history-line" />
+                <SvgIcon icon="ri:chat-history-line"/>
               </span>
               <!-- <span style="margin-left:.25em">{{ usingContext ? '包含上下文' : '不含上下文' }}</span> -->
             </HoverButton>
             <NSelect
-              style="width: 250px"
-              :value="currentChatModel"
-              :options="authStore.session?.chatModels"
-              :disabled="!!authStore.session?.auth && !authStore.token && !authStore.session?.authProxyEnabled"
-              @update-value="(val) => handleSyncChatModel(val)"
+                style="width: 250px"
+                :value="currentChatModel"
+                :options="authStore.session?.chatModels"
+                :disabled="!!authStore.session?.auth && !authStore.token && !authStore.session?.authProxyEnabled"
+                @update-value="(val) => handleSyncChatModel(val)"
             />
-            <NSlider v-model:value="userStore.userInfo.advanced.maxContextCount" :max="100" :min="0" :step="1" style="width: 88px" :format-tooltip="formatTooltip" @update:value="() => { userStore.updateSetting(false) }" />
+            <NSlider v-model:value="userStore.userInfo.advanced.maxContextCount" :max="100" :min="0" :step="1"
+                     style="width: 88px" :format-tooltip="formatTooltip"
+                     @update:value="() => { userStore.updateSetting(false) }"/>
           </div>
           <div class="flex items-center justify-between space-x-2">
             <NAutoComplete v-model:value="prompt" :options="searchOptions" :render-label="renderOption">
               <template #default="{ handleInput, handleBlur, handleFocus }">
                 <NInput
-                  ref="inputRef"
-                  v-model:value="prompt"
-                  :disabled="!!authStore.session?.auth && !authStore.token && !authStore.session?.authProxyEnabled"
-                  type="textarea"
-                  :placeholder="placeholder"
-                  :autosize="{ minRows: isMobile ? 1 : 4, maxRows: isMobile ? 4 : 8 }"
-                  @input="handleInput"
-                  @focus="handleFocus"
-                  @blur="handleBlur"
-                  @keypress="handleEnter"
+                    ref="inputRef"
+                    v-model:value="prompt"
+                    :disabled="!!authStore.session?.auth && !authStore.token && !authStore.session?.authProxyEnabled"
+                    type="textarea"
+                    :placeholder="placeholder"
+                    :autosize="{ minRows: isMobile ? 1 : 4, maxRows: isMobile ? 4 : 8 }"
+                    @input="handleInput"
+                    @focus="handleFocus"
+                    @blur="handleBlur"
+                    @keypress="handleEnter"
                 />
               </template>
             </NAutoComplete>
             <NButton type="primary" :disabled="buttonDisabled" @click="handleSubmit">
               <template #icon>
                 <span class="dark:text-black">
-                  <SvgIcon icon="ri:send-plane-fill" />
+                  <SvgIcon icon="ri:send-plane-fill"/>
                 </span>
               </template>
             </NButton>
@@ -803,6 +799,6 @@ onUnmounted(() => {
         </NSpace>
       </div>
     </footer>
-    <Prompt v-if="showPrompt" v-model:roomId="uuid" v-model:visible="showPrompt" />
+    <Prompt v-if="showPrompt" v-model:roomId="uuid" v-model:visible="showPrompt"/>
   </div>
 </template>
