@@ -4,12 +4,10 @@ import enUS from './en-US'
 import zhCN from './zh-CN'
 import zhTW from './zh-TW'
 import koKR from './ko-KR'
-import {useAppStoreWithOut} from '@/store/modules/app'
+import ruRU from './ru-RU'
 import type {Language} from '@/store/modules/app/helper'
 
-const appStore = useAppStoreWithOut()
-
-const defaultLocale = 'en-US'
+const defaultLocale = 'ru-RU'
 
 const i18n = createI18n({
 	locale: defaultLocale,
@@ -20,6 +18,7 @@ const i18n = createI18n({
 		'zh-CN': zhCN,
 		'zh-TW': zhTW,
 		'ko-KR': koKR,
+		'ru-RU': ruRU,
 	},
 })
 
