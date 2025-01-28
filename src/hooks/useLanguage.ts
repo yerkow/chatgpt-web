@@ -1,30 +1,24 @@
-import { computed } from 'vue'
-import { enUS, koKR, zhCN, zhTW } from 'naive-ui'
-import { useAppStore } from '@/store'
-import { setLocale } from '@/locales'
+import {computed} from 'vue'
+import {enUS, ruRU} from 'naive-ui'
+import {useAppStore} from '@/store'
+import {setLocale} from '@/locales'
 
 export function useLanguage() {
-  const appStore = useAppStore()
+	const appStore = useAppStore()
 
-  const language = computed(() => {
-    switch (appStore.language) {
-      case 'en-US':
-        setLocale('en-US')
-        return enUS
-      case 'zh-CN':
-        setLocale('zh-CN')
-        return zhCN
-      case 'zh-TW':
-        setLocale('zh-TW')
-        return zhTW
-      case 'ko-KR':
-        setLocale('ko-KR')
-        return koKR
-      default:
-        setLocale('zh-CN')
-        return zhCN
-    }
-  })
+	const language = computed(() => {
+		switch (appStore.language) {
+			case 'ru-RU':
+				setLocale('ru-RU')
+				return ruRU
+			case 'en-US':
+				setLocale('en-US')
+				return enUS
+			default:
+				setLocale('ru-RU')
+				return ruRU
+		}
+	})
 
-  return { language }
+	return {language}
 }

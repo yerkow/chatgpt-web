@@ -1,13 +1,13 @@
 import type {App} from 'vue'
 import {createI18n} from 'vue-i18n'
 import enUS from './en-US'
-import zhCN from './zh-CN'
-import zhTW from './zh-TW'
-import koKR from './ko-KR'
 import ruRU from './ru-RU'
 import type {Language} from '@/store/modules/app/helper'
+import {useAppStoreWithOut} from '@/store/modules/app'
 
-const defaultLocale = 'ru-RU'
+const appStore = useAppStoreWithOut()
+
+const defaultLocale = appStore.language || 'ru-RU'
 
 const i18n = createI18n({
 	locale: defaultLocale,
@@ -15,9 +15,6 @@ const i18n = createI18n({
 	allowComposition: true,
 	messages: {
 		'en-US': enUS,
-		'zh-CN': zhCN,
-		'zh-TW': zhTW,
-		'ko-KR': koKR,
 		'ru-RU': ruRU,
 	},
 })

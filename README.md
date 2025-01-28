@@ -1,159 +1,163 @@
 # ChatGPT Web
 
-[中文](./README.md) | [English](./README.en.md)
+[中文](./README.md) | [English](./README)
 
 
-## 说明
+## Introduction
 
 > [!IMPORTANT]
-> **此项目 Fork 自 [Chanzhaoyu/chatgpt-web](https://github.com/Chanzhaoyu/chatgpt-web)**
+> **This project is forked from [Chanzhaoyu/chatgpt-web](https://github.com/Chanzhaoyu/chatgpt-web)**
 >
-> 由于原项目作者不愿意引入对数据库的依赖 故制作该永久分叉独立开发 [详见讨论](https://github.com/Chanzhaoyu/chatgpt-web/pull/589#issuecomment-1469207694)
+> As the original project author does not agree to introduce a dependency on the database, this Hard Fork was created for independent development [discussion for details](https://github.com/Chanzhaoyu/chatgpt-web/pull/589#issuecomment-1469207694)
 >
-> 再次感谢 [Chanzhaoyu](https://github.com/Chanzhaoyu) 大佬对开源的贡献 🙏
+> Thank you again, the great [Chanzhaoyu](https://github.com/Chanzhaoyu), for your contributions to the open-source project 🙏
 
-新增了部分特色功能:
+Some unique features have been added:
 
-[✓] 注册 & 登录 & 重置密码 & 2FA
+[✓] Register & Login & Reset Password & 2FA
 
-[✓] 同步历史会话
+[✓] Sync chat history 
 
-[✓] 前端页面设置apikey
+[✓] Front-end page setting apikey
 
-[✓] 自定义敏感词
+[✓] Custom Sensitive Words
 
-[✓] 每个会话设置独有 Prompt
+[✓] Set unique prompts for each chat room
 
-[✓] 用户管理
+[✓] Users manager
 
-[✓] 多 Key 随机
+[✓] Random Key
 
-[✓] 对话数量限制 & 设置不同用户对话数量 & 兑换数量
+[✓] Conversation round limit & setting different limits by user & giftcards
 
-[✓] 通过 auth proxy 功能实现sso登录 (配合第三方身份验证反向代理 可实现支持 LDAP/OIDC/SAML 等协议登录)
-
+[✓] Implement SSO login through the auth proxy feature (need to integrate a third-party authentication reverse proxy, it can support login protocols such as LDAP/OIDC/SAML)
 
 > [!CAUTION]
-> 声明：此项目只发布于 Github，基于 MIT 协议，免费且作为开源学习使用。并且不会有任何形式的卖号、付费服务、讨论群、讨论组等行为。谨防受骗。
+> This project is only published on GitHub, based on the MIT license, free and for open source learning usage. And there will be no any form of account selling, paid service, discussion group, discussion group and other behaviors. Beware of being deceived.
 
-## 截图
+## Screenshots
+> Disclaimer: This project is only released on GitHub, under the MIT License, free and for open-source learning purposes. There will be no account selling, paid services, discussion groups, or forums. Beware of fraud.
 
 ![cover3](./docs/login.jpg)
 ![cover](./docs/c1.png)
 ![cover2](./docs/c2.png)
 ![cover3](./docs/basesettings.jpg)
-![cover3](./docs/prompt.jpg)
+![cover3](./docs/prompt_en.jpg)
 ![cover3](./docs/user-manager.jpg)
-![cover3](./docs/key-manager.jpg)
+![cover3](./docs/key-manager-en.jpg)
 ![userlimit](./docs/add_redeem_and_limit.png)
 ![setmanuallimit](./docs/manual_set_limit.png)
 ![giftcarddb](./docs/giftcard_db_design.png)
 
 - [ChatGPT Web](#chatgpt-web)
-	- [介绍](#介绍)
-	- [待实现路线](#待实现路线)
-	- [前置要求](#前置要求)
+	- [Introduction](#introduction)
+	- [Roadmap](#roadmap)
+	- [Prerequisites](#prerequisites)
 		- [Node](#node)
 		- [PNPM](#pnpm)
-		- [填写密钥](#填写密钥)
-	- [安装依赖](#安装依赖)
-		- [后端](#后端)
-		- [前端](#前端)
-	- [测试环境运行](#测试环境运行)
-		- [后端服务](#后端服务)
-		- [前端网页](#前端网页)
-	- [环境变量](#环境变量)
-	- [打包](#打包)
-		- [使用 Docker](#使用-docker)
-			- [Docker 参数示例](#docker-参数示例)
-			- [Docker build \& Run](#docker-build--run)
-			- [Docker compose](#docker-compose)
-			- [防止爬虫抓取](#防止爬虫抓取)
-		- [使用 Railway 部署](#使用-railway-部署)
-			- [Railway 环境变量](#railway-环境变量)
-		- [手动打包](#手动打包)
-			- [后端服务](#后端服务-1)
-			- [前端网页](#前端网页-1)
-	- [常见问题](#常见问题)
-	- [参与贡献](#参与贡献)
-	- [赞助](#赞助)
+		- [Fill in the Keys](#fill-in-the-keys)
+	- [Install Dependencies](#install-dependencies)
+		- [Backend](#backend)
+		- [Frontend](#frontend)
+	- [Run in Test Environment](#run-in-test-environment)
+		- [Backend Service](#backend-service)
+		- [Frontend Webpage](#frontend-webpage)
+	- [Packaging](#packaging)
+		- [Using Docker](#using-docker)
+			- [Docker Parameter Example](#docker-parameter-example)
+			- [Docker Build \& Run](#docker-build--run)
+			- [Docker Compose](#docker-compose)
+		- [Deployment with Railway](#deployment-with-railway)
+			- [Railway Environment Variables](#railway-environment-variables)
+		- [Manual packaging](#manual-packaging)
+			- [Backend service](#backend-service-1)
+			- [Frontend webpage](#frontend-webpage-1)
+	- [Frequently Asked Questions](#frequently-asked-questions)
+	- [Contributing](#contributing)
+	- [Sponsorship](#sponsorship)
 	- [License](#license)
-## 介绍
 
-支持双模型，提供了两种非官方 `ChatGPT API` 方法
+## Introduction
 
-| 方式                                          | 免费？ | 可靠性     | 质量 |
-| --------------------------------------------- | ------ | ---------- | ---- |
-| `ChatGPTAPI(gpt-3.5-turbo-0301)`                           | 否     | 可靠       | 相对较笨 |
-| `ChatGPTUnofficialProxyAPI(网页 accessToken)` | 是     | 相对不可靠 | 聪明 |
+Supports dual models, provides two unofficial `ChatGPT API` methods:
 
-对比：
-1. `ChatGPTAPI` 使用 `gpt-3.5-turbo` 通过 `OpenAI` 官方 `API` 调用 `ChatGPT`
-2. `ChatGPTUnofficialProxyAPI` 使用非官方代理服务器访问 `ChatGPT` 的后端`API`，绕过`Cloudflare`（依赖于第三方服务器，并且有速率限制）
+| Method                                        | Free?  | Reliability | Quality |
+| --------------------------------------------- | ------ | ----------- | ------- |
+| `ChatGPTAPI(gpt-3.5-turbo-0301)`                           | No     | Reliable    | Relatively clumsy |
+| `ChatGPTUnofficialProxyAPI(Web accessToken)` | Yes    | Relatively unreliable | Smart |
 
-警告：
-1. 你应该首先使用 `API` 方式
-2. 使用 `API` 时，如果网络不通，那是国内被墙了，你需要自建代理，绝对不要使用别人的公开代理，那是危险的。
-3. 使用 `accessToken` 方式时反向代理将向第三方暴露您的访问令牌，这样做应该不会产生任何不良影响，但在使用这种方法之前请考虑风险。
-4. 使用 `accessToken` 时，不管你是国内还是国外的机器，都会使用代理。默认代理为 [pengzhile](https://github.com/pengzhile) 大佬的 `https://ai.fakeopen.com/api/conversation`，这不是后门也不是监听，除非你有能力自己翻过 `CF` 验证，用前请知悉。[社区代理](https://github.com/transitive-bullshit/chatgpt-api#reverse-proxy)（注意：只有这两个是推荐，其他第三方来源，请自行甄别）
-5. 把项目发布到公共网络时，你应该设置 `AUTH_SECRET_KEY` 变量添加你的密码访问权限，你也应该修改 `index.html` 中的 `title`，防止被关键词搜索到。
+Comparison:
+1. `ChatGPTAPI` uses `gpt-3.5-turbo-0301` to simulate `ChatGPT` through the official `OpenAI` completion `API` (the most reliable method, but it is not free and does not use models specifically tuned for chat).
+2. `ChatGPTUnofficialProxyAPI` accesses `ChatGPT`'s backend `API` via an unofficial proxy server to bypass `Cloudflare` (uses the real `ChatGPT`, is very lightweight, but depends on third-party servers and has rate limits).
 
-切换方式：
-1. 进入 `service/.env.example` 文件，复制内容到 `service/.env` 文件
-2. 使用 `OpenAI API Key` 请填写 `OPENAI_API_KEY` 字段 [(获取 apiKey)](https://platform.openai.com/overview)
-3. 使用 `Web API` 请填写 `OPENAI_ACCESS_TOKEN` 字段 [(获取 accessToken)](https://chat.openai.com/api/auth/session)
-4. 同时存在时以 `OpenAI API Key` 优先
+[Details](https://github.com/Chanzhaoyu/chatgpt-web/issues/138)
 
-环境变量：
+Switching Methods:
+1. Go to the `service/.env.example` file and copy the contents to the `service/.env` file.
+2. For `OpenAI API Key`, fill in the `OPENAI_API_KEY` field [(Get apiKey)](https://platform.openai.com/overview).
+3. For `Web API`, fill in the `OPENAI_ACCESS_TOKEN` field [(Get accessToken)](https://chat.openai.com/api/auth/session).
+4. When both are present, `OpenAI API Key` takes precedence.
 
-全部参数变量请查看或[这里](#环境变量)
+Reverse Proxy:
 
-```
-/service/.env.example
+Available when using `ChatGPTUnofficialProxyAPI`.[Details](https://github.com/transitive-bullshit/chatgpt-api#reverse-proxy)
+
+```shell
+# service/.env
+API_REVERSE_PROXY=
 ```
 
-## 待实现路线
-[✓] 双模型
+Environment Variables:
 
-[✓] 多会话储存和上下文逻辑
+For all parameter variables, check [here](#docker-parameter-example) or see:
 
-[✓] 对代码等消息类型的格式化美化处理
+```
+/service/.env
+```
 
-[✓] 支持用户登录注册
+## Roadmap
+[✓] Dual models
 
-[✓] 前端页面设置 apikey 等信息
+[✓] Multiple session storage and context logic
 
-[✓] 数据导入、导出
+[✓] Formatting and beautifying code-like message types
 
-[✓] 保存消息到本地图片
+[✓] Login or Register
 
-[✓] 界面多语言
+[✓] Set API key and other information on the front-end page.
 
-[✓] 界面主题
+[✓] Data import and export
+
+[✓] Save message to local image
+
+[✓] Multilingual interface
+
+[✓] Interface themes
 
 [✗] More...
 
-## 前置要求
+## Prerequisites
 
 ### Node
 
-`node` 需要 `^16 || ^18 || ^20 || ^22` 版本，使用 [nvm](https://github.com/nvm-sh/nvm) 可管理本地多个 `node` 版本
+`node` requires version `^16 || ^18 || ^20 || ^22`, and multiple local `node` versions can be managed using [nvm](https://github.com/nvm-sh/nvm).
 
 ```shell
 node -v
 ```
 
 ### PNPM
-如果你没有安装过 `pnpm`
+If you have not installed `pnpm` before:
 ```shell
 npm install pnpm -g
 ```
 
-### 填写密钥
-获取 `Openai Api Key` 或 `accessToken` 并填写本地环境变量 [跳转](#介绍)
+### Fill in the Keys
+
+Get `Openai Api Key` or `accessToken` and fill in the local environment variables [jump](#introduction)
 
 ```
-# service/.env 文件
+# service/.env file
 
 # OpenAI API Key - https://platform.openai.com/overview
 OPENAI_API_KEY=
@@ -162,97 +166,88 @@ OPENAI_API_KEY=
 OPENAI_ACCESS_TOKEN=
 ```
 
-## 安装依赖
+## Install Dependencies
 
-> 为了简便 `后端开发人员` 的了解负担，所以并没有采用前端 `workspace` 模式，而是分文件夹存放。如果只需要前端页面做二次开发，删除 `service` 文件夹即可。
+> To make it easier for `backend developers` to understand, we did not use the front-end `workspace` mode, but stored it in different folders. If you only need to do secondary development of the front-end page, delete the `service` folder.
 
-### 后端
+### Backend
 
-进入文件夹 `/service` 运行以下命令
+Enter the `/service` folder and run the following command
 
 ```shell
 pnpm install
 ```
 
-### 前端
-根目录下运行以下命令
+### Frontend
+Run the following command in the root directory
 ```shell
 pnpm bootstrap
 ```
 
-## 测试环境运行
-### 后端服务
+## Run in Test Environment
+### Backend Service
 
-进入文件夹 `/service` 运行以下命令
+Enter the `/service` folder and run the following command
 
 ```shell
 pnpm start
 ```
 
-### 前端网页
-根目录下运行以下命令
+### Frontend Webpage
+Run the following command in the root directory
 ```shell
 pnpm dev
 ```
 
-## 环境变量
+## Packaging
 
-`API` 可用：
+### Using Docker
 
-- `OPENAI_API_KEY` 和 `OPENAI_ACCESS_TOKEN` 二选一
-- `OPENAI_API_BASE_URL` 设置接口地址，可选，默认：`https://api.openai.com`
-- `OPENAI_API_DISABLE_DEBUG` 设置接口关闭 debug 日志，可选，默认：empty 不关闭
+#### Docker Parameter Example
 
-`ACCESS_TOKEN` 可用：
-
-- `OPENAI_ACCESS_TOKEN`  和 `OPENAI_API_KEY` 二选一，同时存在时，`OPENAI_API_KEY` 优先
-- `API_REVERSE_PROXY` 设置反向代理，可选，默认：`https://ai.fakeopen.com/api/conversation`，[社区](https://github.com/transitive-bullshit/chatgpt-api#reverse-proxy)（注意：只有这两个是推荐，其他第三方来源，请自行甄别）
-
-通用：
-
-- `AUTH_SECRET_KEY` 访问权限密钥，可选
-- `MAX_REQUEST_PER_HOUR` 每小时最大请求次数，可选，默认无限
-- `TIMEOUT_MS` 超时，单位毫秒，可选
-- `SOCKS_PROXY_HOST` 和 `SOCKS_PROXY_PORT` 一起时生效，可选
-- `SOCKS_PROXY_PORT` 和 `SOCKS_PROXY_HOST` 一起时生效，可选
-- `HTTPS_PROXY` 支持 `http`，`https`, `socks5`，可选
-
-## 打包
-
-### 使用 Docker
-
-#### Docker 参数示例
+- `OPENAI_API_KEY` one of two
+- `OPENAI_ACCESS_TOKEN` one of two, `OPENAI_API_KEY` takes precedence when both are present
+- `OPENAI_API_BASE_URL` optional, available when `OPENAI_API_KEY` is set
+- `OPENAI_API_MODEL`  `ChatGPTAPI` OR `ChatGPTUnofficialProxyAPI`
+- `API_REVERSE_PROXY` optional, available when `OPENAI_ACCESS_TOKEN` is set [Reference](#introduction)
+- `AUTH_SECRET_KEY` Access Password，optional
+- `TIMEOUT_MS` timeout, in milliseconds, optional
+- `SOCKS_PROXY_HOST` optional, effective with SOCKS_PROXY_PORT
+- `SOCKS_PROXY_PORT` optional, effective with SOCKS_PROXY_HOST
+- `SOCKS_PROXY_USERNAME` optional, effective with SOCKS_PROXY_HOST and SOCKS_PROXY_PORT
+- `SOCKS_PROXY_PASSWORD` optional, effective with SOCKS_PROXY_HOST and SOCKS_PROXY_PORT
+- `HTTPS_PROXY` optional, support http，https, socks5
 
 ![docker](./docs/docker.png)
 
-#### Docker build & Run
+#### Docker Build & Run
 
 ```bash
 GIT_COMMIT_HASH=`git rev-parse HEAD`
 RELEASE_VERSION=`git branch --show-current`
 docker build --build-arg GIT_COMMIT_HASH=${GIT_COMMIT_HASH} --build-arg RELEASE_VERSION=${RELEASE_VERSION} -t chatgpt-web .
 
-# 前台运行
-# 如果在宿主机运行 mongodb 则使用 MONGODB_URL=mongodb://host.docker.internal:27017/chatgpt
-docker run --name chatgpt-web --rm -it -p 3002:3002 --env OPENAI_API_KEY=your_api_key --env MONGODB_URL=your_mongodb_url chatgpt-web
+# foreground operation
+# If run mongodb in host machine, please use MONGODB_URL=mongodb://host.docker.internal:27017/chatgpt
+docker run --name chatgpt-web --rm -it -p 127.0.0.1:3002:3002 --env OPENAI_API_KEY=your_api_key --env MONGODB_URL=your_mongodb_url chatgpt-web
 
-# 后台运行
+# background operation
 docker run --name chatgpt-web -d -p 127.0.0.1:3002:3002 --env OPENAI_API_KEY=your_api_key --env MONGODB_URL=your_mongodb_url chatgpt-web
 
-# 运行地址
+# running address
 http://localhost:3002/
 ```
 
-#### Docker compose
+#### Docker Compose
 
-[Hub 地址](https://hub.docker.com/r/chatgptweb/chatgpt-web)
+[Hub Address](https://hub.docker.com/r/chatgptweb/chatgpt-web)
 
 ```yml
 version: '3'
 
 services:
   app:
-    image: chatgptweb/chatgpt-web # 总是使用latest,更新时重新pull该tag镜像即可
+    image: chatgptweb/chatgpt-web # always use latest, pull the tag image again when updating
     container_name: chatgptweb
     restart: unless-stopped
     ports:
@@ -261,21 +256,19 @@ services:
       - database
     environment:
       TZ: Asia/Shanghai
-      # 每小时最大请求次数，可选，默认无限
-      MAX_REQUEST_PER_HOUR: 0
-      # 访问jwt加密参数，可选 不为空则允许登录 同时需要设置 MONGODB_URL
-      AUTH_SECRET_KEY: xxx
-      # 网站名称
+      # Title for site
       SITE_TITLE: ChatGpt Web
-      # mongodb 的连接字符串
+      # access salt，optional Allow login if not empty.
+      AUTH_SECRET_KEY: xxx
+      # mongodb's connection string
       MONGODB_URL: 'mongodb://chatgpt:xxxx@database:27017'
-      # 开启注册之后 密码加密的盐
+      # After register enabled, Salt for password encryption
       PASSWORD_MD5_SALT: xxx
-      # 开启注册之后 超级管理邮箱
+      # After register enabled, super administrator
       ROOT_USER: me@example.com
-      # 网站是否开启注册 必须开启, 否则管理员都没法注册, 可后续关闭
+      # Allow anyone register, Must be turned on, otherwise administrators cannot register, can be turned off later.
       REGISTER_ENABLED: true
-      # 更多配置, 在运行后, 注册管理员, 在管理员页面中设置
+      # More configurations, register an administrator after running and set it in the administrator page.
     links:
       - database
 
@@ -297,105 +290,98 @@ services:
 volumes:
   mongodb: {}
 ```
-- `OPENAI_API_BASE_URL`  可选，设置 `OPENAI_API_KEY` 时可用
+The `OPENAI_API_BASE_URL` is optional and only used when setting the `OPENAI_API_KEY`.
 
-#### 防止爬虫抓取
-
-**nginx**
-
-将下面配置填入nginx配置文件中，可以参考 `docker-compose/nginx/nginx.conf` 文件中添加反爬虫的方法
-
-```
-    # 防止爬虫抓取
-    if ($http_user_agent ~* "360Spider|JikeSpider|Spider|spider|bot|Bot|2345Explorer|curl|wget|webZIP|qihoobot|Baiduspider|Googlebot|Googlebot-Mobile|Googlebot-Image|Mediapartners-Google|Adsbot-Google|Feedfetcher-Google|Yahoo! Slurp|Yahoo! Slurp China|YoudaoBot|Sosospider|Sogou spider|Sogou web spider|MSNBot|ia_archiver|Tomato Bot|NSPlayer|bingbot"){
-      return 403;
-    }
-```
-
-###  使用 Railway 部署
+### Deployment with Railway
 
 [![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/new/template/yytmgc)
 
-> 参考这个 issue 详细教程  https://github.com/Kerwin1202/chatgpt-web/issues/266
+> Refer to this issue  https://github.com/Kerwin1202/chatgpt-web/issues/266
 
-> 注意: `Railway` 修改环境变量会重新 `Deploy`
+> Note: Changing environment variables in Railway will cause re-deployment.
 
-### 手动打包
-#### 后端服务
-> 如果你不需要本项目的 `node` 接口，可以省略如下操作
+### Manual packaging
 
-复制 `service` 文件夹到你有 `node` 服务环境的服务器上。
+#### Backend service
+
+> If you don't need the `node` interface of this project, you can skip the following steps.
+
+Copy the `service` folder to a server that has a `node` service environment.
 
 ```shell
-# 安装
+# Install
 pnpm install
 
-# 打包
+# Build
 pnpm build
 
-# 运行
+# Run
 pnpm prod
 ```
 
-PS: 不进行打包，直接在服务器上运行 `pnpm start` 也可
+PS: You can also run `pnpm start` directly on the server without packaging.
 
-#### 前端网页
+#### Frontend webpage
 
-1、修改根目录下 `.env` 文件中的 `VITE_GLOB_API_URL` 为你的实际后端接口地址
+1. Refer to the root directory `.env.example` file content to create `.env` file, modify `VITE_GLOB_API_URL` in `.env` at the root directory to your actual backend interface address.
+2. Run the following command in the root directory and then copy the files in the `dist` folder to the root directory of your website service.
 
-2、根目录下运行以下命令，然后将 `dist` 文件夹内的文件复制到你网站服务的根目录下
-
-[参考信息](https://cn.vitejs.dev/guide/static-deploy.html#building-the-app)
+[Reference information](https://cn.vitejs.dev/guide/static-deploy.html#building-the-app)
 
 ```shell
 pnpm build
 ```
+
+## Frequently Asked Questions
+
+Q: Why does Git always report an error when committing?
+
+A: Because there is submission information verification, please follow the [Commit Guidelines](./CONTRIBUTING.en.md).
+
+Q: Where to change the request interface if only the frontend page is used?
+
+A: The `VITE_GLOB_API_URL` field in the `.env` file at the root directory.
+
+Q: All red when saving the file?
+
+A: For `vscode`, please install the recommended plug-in of the project or manually install the `Eslint` plug-in.
+
+Q: Why doesn't the frontend have a typewriter effect?
+
+A: One possible reason is that after Nginx reverse proxying, buffering is turned on, and Nginx will try to buffer a certain amount of data from the backend before sending it to the browser. Please try adding `proxy_buffering off;` after the reverse proxy parameter and then reloading Nginx. Other web server configurations are similar.
+
+Q: The content returned is incomplete?
+
+A: There is a length limit for the content returned by the API each time. You can modify the `VITE_GLOB_OPEN_LONG_REPLY` field in the `.env` file under the root directory, set it to `true`, and rebuild the front-end to enable the long reply feature, which can return the full content. It should be noted that using this feature may bring more API usage fees.
 
 ## Auth Proxy Mode
 
 > [!WARNING]
-> 该功能仅适用于有相关经验的运维人员在集成企业内部账号管理系统时部署 配置不当可能会导致安全风险
+> This feature is only provided for Operations Engineer with relevant experience to deploy during the integration of the enterprise's internal account management system. Improper configuration may lead to security risks.
 
-设置环境变量 `AUTH_PROXY_ENABLED=true` 即可开启 auth proxy 模式
+Set env `AUTH_PROXY_ENABLED=true` can enable auth proxy mode.
 
-在开启该功能后 需确保 chatgpt-web 只能通过反向代理访问
+After activating this feature, it is necessary to ensure that chatgpt-web can only be accessed through a reverse proxy.
 
-由反向代理进行进行身份验证 并再转发请求时携带请求头标识用户身份
-默认请求头为 `X-Email` 并可以通过设置环境变量 `AUTH_PROXY_HEADER_NAME` 自定义配置
+Authentication is carried out by the reverse proxy, which then forwards the request with the header to identify the user identity.
+Default header name is `X-Email`, can custom config use set env `AUTH_PROXY_HEADER_NAME`.
 
-推荐当前 Idp 使用 LDAP 协议的 可以选择使用 [authelia](https://www.authelia.com)
+Recommended for current IdP to use LDAP protocol, using [authelia](https://www.authelia.com)
 
-当前 Idp 使用 OIDC 协议的 可以选择使用 [oauth2-proxy](https://oauth2-proxy.github.io/oauth2-proxy)
+Recommended for current IdP to use OIDC protocol, using [oauth2-proxy](https://oauth2-proxy.github.io/oauth2-proxy)
 
 
-## 常见问题
-Q: 为什么 `Git` 提交总是报错？
+## Contributing
 
-A: 因为有提交信息验证，请遵循 [Commit 指南](./CONTRIBUTING.md)
+Please read the [Contributing Guidelines](./CONTRIBUTING.en.md) before contributing.
 
-Q: 如果只使用前端页面，在哪里改请求接口？
-
-A: 根目录下 `.env` 文件中的 `VITE_GLOB_API_URL` 字段。
-
-Q: 文件保存时全部爆红?
-
-A: `vscode` 请安装项目推荐插件，或手动安装 `Eslint` 插件。
-
-Q: 前端没有打字机效果？
-
-A: 一种可能原因是经过 Nginx 反向代理，开启了 buffer，则 Nginx 会尝试从后端缓冲一定大小的数据再发送给浏览器。请尝试在反代参数后添加 `proxy_buffering off;`，然后重载 Nginx。其他 web server 配置同理。
-
-## 参与贡献
-
-贡献之前请先阅读 [贡献指南](./CONTRIBUTING.md)
-
-感谢所有做过贡献的人!
+Thanks to all the contributors!
 
 <a href="https://github.com/chatgpt-web-dev/chatgpt-web/graphs/contributors">
   <img alt="Contributors Image" src="https://contrib.rocks/image?repo=chatgpt-web-dev/chatgpt-web" width="550" />
 </a>
 
-## Star 历史
+## Star History
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=chatgpt-web-dev/chatgpt-web&type=Date&theme=dark" />
@@ -403,27 +389,17 @@ A: 一种可能原因是经过 Nginx 反向代理，开启了 buffer，则 Nginx
   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=chatgpt-web-dev/chatgpt-web&type=Date" width="550" />
 </picture>
 
-## 赞助
-如果你觉得这个项目对你有帮助，请给我点个Star。并且情况允许的话，可以给我一点点支持，总之非常感谢支持～
+## Sponsorship
 
-<div style="display: flex; gap: 20px;">
-	<div style="text-align: center">
-		<img style="width: 200px" src="./docs/wechat.png" alt="微信" />
-		<p>WeChat Pay</p>
-	</div>
-	<div style="text-align: center">
-		<img style="width: 200px" src="./docs/alipay.png" alt="支付宝" />
-		<p>Alipay</p>
-	</div>
-</div>
+If you find this project helpful, please give me a star.
 
 ---
 
-感谢 [DigitalOcean](https://www.digitalocean.com/) 赞助提供开源积分用于运行基础设施服务器
+Thanks to [DigitalOcean](https://www.digitalocean.com/) for sponsoring providing open-source credits used to run our infrastructure servers.
 
 <p>
   <a href="https://www.digitalocean.com/">
-    <img src="https://opensource.nyc3.cdn.digitaloceanspaces.com/attribution/assets/SVG/DO_Logo_horizontal_blue.svg" width="201px" alt="digitalocean">
+    <img alt="digitalocean" src="https://opensource.nyc3.cdn.digitaloceanspaces.com/attribution/assets/SVG/DO_Logo_horizontal_blue.svg" width="201px">
   </a>
 </p>
 

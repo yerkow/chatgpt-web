@@ -28,30 +28,30 @@ RUN npm install pnpm -g
 
 WORKDIR /app
 
-COPY /service/package.json /app
+COPY /api/package.json /app
 
-COPY /service/pnpm-lock.yaml /app
+COPY /api/pnpm-lock.yaml /app
 
 RUN pnpm install
 
-COPY /service /app
+COPY /api /app
 
 RUN pnpm build
 
-# service
+# api
 FROM node:20-alpine
 
 RUN npm install pnpm -g
 
 WORKDIR /app
 
-COPY /service/package.json /app
+COPY /api/package.json /app
 
-COPY /service/pnpm-lock.yaml /app
+COPY /api/pnpm-lock.yaml /app
 
 RUN pnpm install --production && rm -rf /root/.npm /root/.pnpm-store /usr/local/share/.cache /tmp/*
 
-COPY /service /app
+COPY /api /app
 
 COPY --from=frontend /app/dist /app/public
 

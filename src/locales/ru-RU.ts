@@ -190,7 +190,6 @@ export default {
 		fastDelMsg: 'Быстрое удаление сообщения',
 	},
 	store: {
-		siderButton: 'Магазин подсказок',
 		local: 'Локальные',
 		online: 'Онлайн',
 		title: 'Заголовок',
